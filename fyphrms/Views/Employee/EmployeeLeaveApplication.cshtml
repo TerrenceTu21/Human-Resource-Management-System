@@ -1,0 +1,231 @@
+﻿@model fyphrms.Models.Employees.EmployeeLeaveApplicationViewModel
+
+@{
+    ViewData["Title"] = "Leave Application";
+    Layout = "_Layout"; 
+}
+
+<style>
+    .container-fluid {
+        padding: 20px;
+    }
+
+    
+    .leave-summary-card {
+        background-color: #fff; 
+        border-radius: 12px; 
+        padding: 25px; 
+        margin-bottom: 30px; 
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); 
+        border: 1px solid #e0e0e0; 
+    }
+
+    
+    .leave-balance-header,
+    .leave-balance-row {
+        display: grid; /
+        grid-template-columns: 2.5fr 1fr 1fr 1fr; 
+        align-items: center; 
+        padding: 12px 0; 
+    }
+
+    .leave-balance-header {
+        font-weight: 600; 
+        color: #7a7a7a; 
+        border-bottom: 2px solid #e9ecef; 
+        margin-bottom: 8px; 
+        text-transform: uppercase; 
+        font-size: 0.85rem; 
+    }
+
+    .leave-balance-row {
+        font-size: 0.95rem; 
+        color: #333; 
+        border-bottom: 1px dashed #f0f0f0; 
+    }
+
+        .leave-balance-row:last-child {
+            border-bottom: none; 
+        }
+
+        .leave-balance-row span:not(:first-child) {
+            text-align: center; 
+        }
+
+    
+    .leave-balance-days {
+        font-weight: 700;
+        color: #6a5acd; 
+        cursor: pointer; 
+        transition: color 0.2s ease; 
+    }
+
+        .leave-balance-days:hover {
+            color: #5345b1; 
+        }
+
+    
+    .leave-summary-card .text-muted {
+        padding: 20px 0;
+        text-align: center;
+        font-style: italic;
+        color: #999 !important;
+    }
+
+    
+    .application-form-card {
+        background-color: #fff;
+        border-radius: 12px; 
+        padding: 30px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); 
+        border: 1px solid #e0e0e0;
+    }
+
+    .btn-leave-history {
+        background-color: #6a5acd;
+        color: white;
+        border-radius: 8px; /
+        padding: 10px 25px;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+    }
+
+        .btn-leave-history:hover {
+            background-color: #5345b1;
+            color: white; 
+        }
+
+    
+    .form-label {
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 10px 15px;
+        box-shadow: none; 
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6a5acd;
+            box-shadow: 0 0 0 0.2rem rgba(106, 90, 205, 0.25); 
+        }
+
+    
+    .text-dark {
+        color: #333 !important;
+    }
+
+    .text-secondary {
+        color: #888 !important;
+    }
+
+    .text-muted {
+        color: #a0a0a0 !important;
+    }
+
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark">Leave Application</h2>
+        <span class="text-secondary">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+
+    <div class="d-flex justify-content-end mb-4">
+        <a asp-action="EmployeeLeaveHistory" class="btn btn-leave-history">Leave History</a>
+    </div>
+
+    <h4 class="mb-3 text-secondary">Your Leave Balances (@DateTime.Now.Year)</h4>
+    <div class="leave-summary-card">
+
+        <div class="w-100">
+            <div class="leave-balance-row text-uppercase fw-bold pb-2 mb-2" style="border-bottom: 2px solid #ccc;">
+                <span>Leave Type</span>
+                <span>Entitlement</span>
+                <span>Taken</span>
+                <span>Remaining</span>
+            </div>
+
+            @if (Model.LeaveBalances != null && Model.LeaveBalances.Any())
+            {
+                @foreach (var balance in Model.LeaveBalances)
+                {
+                    <div class="leave-balance-row">
+                        <span class="fw-bold">@balance.LeaveType</span>
+                        <span>@balance.TotalEntitlement</span>
+                        <span>@balance.DaysTaken</span>
+                        <span class="leave-balance-days">@balance.DaysRemaining</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center text-muted pt-3 mb-0">No current leave entitlements found.</p>
+            }
+        </div>
+
+    </div>
+
+    <div class="application-form-card">
+        <h4 class="mb-4 text-secondary">Apply for New Leave</h4>
+
+        <form asp-action="SubmitLeave" method="post" enctype="multipart/form-data">
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label asp-for="SelectedLeaveTypeID" class="form-label">Leave Type</label>
+                    <select asp-for="SelectedLeaveTypeID" class="form-select">
+                        <option value="">Select Type</option>
+                        @if (Model.AvailableLeaveTypes != null)
+                        {
+                            @foreach (var type in Model.AvailableLeaveTypes)
+                            {
+                                <option value="@type.LeaveTypeID">@type.TypeName</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="SelectedLeaveTypeID" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="StartDate" class="form-label">Start Date</label>
+                    <input asp-for="StartDate" type="date" class="form-control" />
+                    <span asp-validation-for="StartDate" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="EndDate" class="form-label">End Date</label>
+                    <input asp-for="EndDate" type="date" class="form-control" />
+                    <span asp-validation-for="EndDate" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Reason" class="form-label">Reason</label>
+                    <textarea asp-for="Reason" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Reason" class="text-danger text-sm"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Upload Medical Proof (only required for Sick / Hospitalization)</label>
+                    <input asp-for="ProofPath" type="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                </div>
+
+                <div class="col-12 d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-leave-history">Submit Leave</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

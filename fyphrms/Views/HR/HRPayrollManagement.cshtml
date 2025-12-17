@@ -1,0 +1,94 @@
+﻿@using fyphrms.Models.HR
+@model HRPayrollViewModel
+
+@{
+    ViewData["Title"] = "Payroll Management";
+    Layout = "_Layout";
+
+    string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Paid" => "bg-green-100 text-green-800",
+            "Pending" => "bg-yellow-100 text-yellow-800",
+            "Failed" => "bg-red-100 text-red-800",
+            _ => "bg-gray-100 text-gray-800",
+        };
+    }
+}
+
+<link rel="stylesheet" href="~/css/HR/hrleavemanagement.css" asp-append-version="true" />
+
+<div class="p-6 bg-white rounded-lg shadow-lg">
+
+    <div class="flex justify-between items-center mb-6 border-b pb-4">
+        <h1 class="text-3xl font-bold text-gray-800">Payroll Management</h1>
+        <div class="flex items-center space-x-3">
+            <span class="text-gray-500 text-sm font-medium">
+                @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")
+            </span>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-inner">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Month</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total Net Pay (RM)</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (!Model.MonthlySummaries.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-sm text-gray-500">
+                            <i class="fas fa-clipboard-list text-5xl mb-4 text-gray-300"></i>
+                            <p class="mb-4 text-lg font-medium">No payroll records found.</p>
+                            <a asp-controller="HR"
+                               asp-action="HRProcessPayroll"
+                               class="text-indigo-600 hover:text-indigo-800 font-semibold border-b border-indigo-600">
+                                Click here to process the first payroll.
+                            </a>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var summary in Model.MonthlySummaries)
+                    {
+                        <tr>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                @summary.MonthYearDisplay
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                RM @summary.TotalNetPay.ToString("N2")
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full @GetStatusClass(summary.Status)">
+                                    @summary.Status
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a asp-action="HRViewPayslip"
+                                   asp-route-month="@summary.Month"
+                                   asp-route-year="@summary.Year"
+                                   class="view-payslip-btn">
+                                    View Payslips
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+}

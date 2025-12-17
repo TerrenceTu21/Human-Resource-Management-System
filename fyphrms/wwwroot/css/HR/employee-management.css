@@ -1,0 +1,92 @@
+﻿/* --- EMPLOYEE MANAGEMENT PAGE STYLES --- */
+
+:root {
+    --primary-purple: #6a1b9a; /* Main theme color */
+    --link-blue: #007bff; /* Standard Bootstrap link blue */
+    --link-red: #dc3545; /* Standard Bootstrap error red */
+    --table-header-bg: #f8f9fa; /* Light gray table header */
+}
+
+/* * 1. TABLE ENHANCEMENTS: Making the table slightly bigger/less tight
+ */
+
+/* Ensure table headers are capitalized as shown in the image */
+.employee-list-table th {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6c757d; /* Darker grey text for headers */
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    /* Increase top/bottom padding for more breathing room */
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+}
+
+/* Table body text styles */
+.employee-list-table td {
+    font-size: 0.9rem;
+    color: #343a40;
+    vertical-align: middle;
+    /* Increase top/bottom padding for more breathing room */
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+}
+
+    /* Style for action links (Edit/Delete) */
+    .employee-list-table td a.text-primary {
+        color: var(--link-blue) !important;
+    }
+
+    .employee-list-table td a.text-danger {
+        color: var(--link-red) !important;
+    }
+
+/* Card Styling for the main list container */
+.employee-management-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden; /* Ensures rounded corners are respected by table */
+}
+
+    .employee-management-card .card-header {
+        border-bottom: 1px solid #e9ecef;
+    }
+
+/* Add Employee Button styling (Purple theme) */
+.add-employee-btn {
+    background-color: var(--primary-purple) !important;
+    border-color: var(--primary-purple) !important;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+    .add-employee-btn:hover {
+        background-color: #55167f !important;
+        border-color: #55167f !important;
+    }
+
+.clickable-row {
+    cursor: pointer;
+}
+
+    .clickable-row:hover {
+        background-color: #f5f5f5; /* Subtle hover effect */
+        transition: background-color 0.15s ease-in-out;
+    }
+
+/* * 2. SEARCH BAR ADJUSTMENT: Making the search bar shorter
+ */
+
+/* Container for the search bar (added to the outer div in the CSHTML) */
+.search-input-container {
+    max-width: 600px; /* Set a maximum width for the search bar */
+    margin-left: auto; /* Center the container */
+    margin-right: 0; /* Center the container */
+}
+
+    /* Ensures the input group is responsive within its container */
+    .search-input-container .input-group {
+        width: 100%;
+    }

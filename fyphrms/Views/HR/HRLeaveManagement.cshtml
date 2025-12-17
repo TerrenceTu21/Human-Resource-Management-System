@@ -1,0 +1,218 @@
+﻿@model fyphrms.Models.HR.HRLeaveManagementViewModel
+
+@{
+    ViewData["Title"] = "Leave Management";
+    Layout = "_Layout"; 
+
+    string GetFilterClass(string filterName)
+    {
+        return Model.ActiveFilter.Equals(filterName, StringComparison.OrdinalIgnoreCase)
+            ? "bg-indigo-600 text-white hover:bg-indigo-700"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200";
+    }
+
+    string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Approved" => "bg-green-100 text-green-800",
+            "Pending" => "bg-yellow-100 text-yellow-800",
+            "Rejected" or "Cancelled" => "bg-red-100 text-red-800",
+            _ => "bg-gray-100 text-gray-800",
+        };
+    }
+}
+<link rel="stylesheet" href="~/css/HR/hrleavemanagement.css" asp-append-version="true" />
+
+
+<div class="p-6 bg-white rounded-lg shadow-lg">
+    <div class="flex justify-between items-center mb-6 border-b pb-4">
+        <h1 class="text-3xl font-bold text-gray-800">Leave Management</h1>
+        <span class="text-gray-500">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+
+    <div class="flex space-x-3 mb-6">
+        <a asp-action="HRLeaveManagement" asp-route-filter="All" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("all")">All</a>
+        <a asp-action="HRLeaveManagement" asp-route-filter="Pending" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("pending")">Pending</a>
+        <a asp-action="HRLeaveManagement" asp-route-filter="Approved" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("approved")">Approved</a>
+        <a asp-action="HRLeaveManagement" asp-route-filter="Cancelled" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("cancelled")">Rejected/Cancelled</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+
+    <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-inner">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Employee</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Dates</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Days</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Reason Summary</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Proof</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Comments</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (!Model.LeaveRequests.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No @(Model.ActiveFilter.Equals("all", StringComparison.OrdinalIgnoreCase) ? "" : Model.ActiveFilter) leave requests found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var request in Model.LeaveRequests)
+                    {
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@request.ID</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@request.EmployeeFullName</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@request.LeaveType</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                @request.StartDate.ToString("yyyy-MM-dd") <br /> to <br /> @request.EndDate.ToString("yyyy-MM-dd")
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@request.Days</td>
+                            <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate" title="@request.ReasonSummary">@request.ReasonSummary</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                @if (!string.IsNullOrWhiteSpace(request.ProofPath))
+                                {
+                                    <a href="@request.ProofPath" target="_blank" class="action-button text-indigo-600">Click to View</a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">
+                                @if (request.Status.Equals("Rejected", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(request.RejectReason))
+                                {
+                                    <span title="@request.RejectReason">@request.RejectReason</span>
+                                }
+                                else if (request.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span>Cancelled by User</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full @GetStatusClass(request.Status)">
+                                    @request.Status
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <!-- <a asp-action="HREmployeeDetails" asp-route-id="@request.EmployeeID" class="action-button text-indigo-600 hover:text-indigo-900">View Details</a> -->
+                                @if (request.Status == "Pending")
+                                {
+                                    @* --- Approve Form: Call custom confirmation function --- *@
+                                    <form asp-action="ApproveLeave" method="post" class="inline-block" id="approveForm_@request.ID">
+                                        <input type="hidden" name="id" value="@request.ID" />
+                                        <button type="button"
+                                                onclick="confirmLeaveApproval(document.getElementById('approveForm_@request.ID'), @request.ID)"
+                                                class="text-green-600 hover:text-green-900 ml-2">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    @* --- Reject Form: Call custom confirmation function --- *@
+                                    <form asp-action="RejectLeave" method="post" class="inline-block" id="rejectForm_@request.ID">
+                                        <input type="hidden" name="id" value="@request.ID" />
+                                        <button type="button"
+                                                onclick="confirmLeaveRejection(document.getElementById('rejectForm_@request.ID'), @request.ID)"
+                                                class="text-red-600 hover:text-red-900 ml-2">
+                                            Reject
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Helper function to handle Approve confirmation
+    function confirmLeaveApproval(formElement, requestId) {
+        Swal.fire({
+            title: "Approve Leave?",
+            text: `Are you sure you want to APPROVE Leave ID ${requestId}?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745", // Green color for Approve
+            cancelButtonColor: "#6c757d", // Grey color for Cancel
+            confirmButtonText: "Yes, Approve"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form only if the user clicks "Yes, Approve"
+                formElement.submit();
+            }
+        });
+    }
+
+    // Helper function to handle Reject confirmation and capture reason
+    function confirmLeaveRejection(formElement, requestId) {
+        Swal.fire({
+            title: "Reject Leave?",
+            text: `Please provide the reason for REJECTING Leave ID ${requestId}. This action is irreversible.`,
+            icon: "warning",
+            input: 'textarea', // Use a textarea for the reason input
+            inputLabel: 'Rejection Reason (Required)',
+            inputPlaceholder: 'Enter the reason for rejection here...',
+            inputAttributes: {
+                'aria-label': 'Type your rejection reason here'
+            },
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545", // Red color for Reject
+            cancelButtonColor: "#6c757d", // Grey color for Cancel
+            confirmButtonText: "Yes, Reject",
+            // Validate that the user entered something
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') {
+                    return 'You need to write a rejection reason!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const rejectReason = result.value;
+
+                // 1. Dynamically create a hidden input for the RejectReason
+                const reasonInput = document.createElement('input');
+                reasonInput.setAttribute('type', 'hidden');
+                // IMPORTANT: 'RejectReason' matches the parameter name in the C# action method
+                reasonInput.setAttribute('name', 'RejectReason');
+                reasonInput.setAttribute('value', rejectReason);
+
+                // 2. Append the input to the form
+                formElement.appendChild(reasonInput);
+
+                // 3. Submit the form
+                formElement.submit();
+            }
+        });
+    }
+</script>

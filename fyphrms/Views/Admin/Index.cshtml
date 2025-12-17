@@ -1,0 +1,347 @@
+﻿@model fyphrms.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_Layout";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<style>
+    
+    :root {
+        --primary-purple: #7b68ee; 
+        --card-border-blue: #007bff;
+        --card-border-green: #28a745;
+        --card-border-yellow: #ffc107;
+    }
+
+    body {
+        background-color: #f4f6f9;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+        background-color: var(--primary-purple) !important;
+        color: white;
+        padding: 25px;
+        border-radius: 12px;
+    }
+
+    /* Metric Cards */
+    .metric-card .card {
+        border-radius: 10px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-left: 5px solid transparent;
+        height: 100%;
+    }
+
+        .metric-card .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15) !important;
+            cursor: pointer; 
+        }
+
+    .metric-card.employees .card {
+        border-left-color: var(--card-border-blue);
+    }
+
+    .metric-card.pending .card {
+        border-left-color: var(--card-border-yellow);
+    }
+
+    .metric-card.departments .card {
+        border-left-color: var(--card-border-green);
+    }
+
+    .metric-card i {
+        font-size: 2.5rem;
+        opacity: 0.75;
+    }
+
+    .metric-card h2 {
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    
+    .modal-xl {
+        --bs-modal-width: 90vw; 
+    }
+</style>
+
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded shadow-sm hero-banner">
+            <h2 class="mb-1">Hello, Admin! 👋</h2>
+            <p class="lead mb-2">System Administrator</p>
+            <button type="button" class="btn btn-light btn-sm fw-bold" onclick="showUserList()">
+                <i class="fas fa-user-shield me-2"></i> Manage System Users
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+
+    <div class="col-lg-4 col-md-6 metric-card employees" onclick="showEmployeeList()">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="text-secondary fw-bold text-uppercase mb-1">Total Employees</h6>
+                        <h2 class="mb-0 text-dark">@Model.TotalEmployees</h2>
+                    </div>
+                    <i class="fas fa-users fa-2x" style="color: var(--card-border-blue);"></i>
+                </div>
+                <div class="mt-2">
+                    <a href="#" class="small text-decoration-none" onclick="showEmployeeList(event)">View Employee List (Click Here)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6 metric-card departments">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h6 class="text-secondary fw-bold text-uppercase mb-1">Total Departments</h6>
+                        <h2 class="mb-0 text-dark">@Model.TotalDepartments</h2>
+                    </div>
+                    <i class="fas fa-building fa-2x" style="color: var(--card-border-green);"></i>
+                </div>
+                <div class="mt-2">
+                    <a asp-controller="Department" asp-action="Manage" class="small text-decoration-none">Manage Departments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light fw-bold">
+                System Audit Log (Last 10 Actions)
+            </div>
+            <div class="card-body">
+                <p class="card-text text-muted">Recent system configuration changes and critical activity will appear here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="employeeListModal" tabindex="-1" aria-labelledby="employeeListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="employeeListModalLabel"><i class="fas fa-list"></i> Full Employee List</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Position</th>
+                            <th>Department</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Employees != null && Model.Employees.Any())
+                        {
+                            @foreach (var employee in Model.Employees)
+                            {
+                                <tr>
+                                    <td>@employee.EmployeeID</td>
+                                    <td>@employee.FullName</td>
+                                    <td>@employee.Email</td>
+                                    <td>@employee.Position</td>
+                                    <td>@employee.Department</td>
+                                    <td>
+                                        <a asp-controller="Employee" asp-action="Details" asp-route-id="@employee.EmployeeID" class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i> View</a>
+                                        <a asp-controller="Employee" asp-action="Edit" asp-route-id="@employee.EmployeeID" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No employee records found in the database.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a asp-controller="Admin" asp-action="CreateEmployee" class="btn btn-success"><i class="fas fa-plus"></i> Add New Employee</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userListModal" tabindex="-1" aria-labelledby="userListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="userListModalLabel"><i class="fas fa-user-shield"></i> All System Users (Identity Accounts)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>User ID</th>
+                            <th>Email (Username)</th>
+                            <th>Primary Role</th>
+                            <th>Email Confirmed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.SystemUsers != null && Model.SystemUsers.Any())
+                        {
+                            @foreach (var user in Model.SystemUsers)
+                            {
+                                <tr>
+                                    <td><span class="text-monospace small">@user.UserID</span></td>
+                                    <td>@user.Email</td>
+                                    <td><span class="badge bg-primary">@user.CurrentRole</span></td>
+                                    <td>
+                                        @if (user.EmailConfirmed)
+                                        {
+                                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Yes</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger"><i class="fas fa-times-circle"></i> No</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-warning disabled">Edit Roles</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger disabled">Reset Password</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No system user accounts found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success me-auto" data-bs-toggle="modal" data-bs-target="#addSystemUserModal">
+                    <i class="fas fa-user-plus me-1"></i> Add System User
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addSystemUserModal" tabindex="-1" aria-labelledby="addSystemUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="addSystemUserModalLabel"><i class="fas fa-user-plus"></i> Create New System User Account</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Admin" asp-action="CreateSystemUser" method="post">
+                <div class="modal-body">
+                    <p class="text-muted">This creates a new login account. The Admin role must be assigned separately after creation.</p>
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Email (Username)</label>
+                        <input type="email" id="Email" name="Email" class="form-control" required placeholder="user@company.com" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="Password" class="form-label">Temporary Password</label>
+                        <input type="password" id="Password" name="Password" class="form-control" required minlength="6" placeholder="******" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="RoleName" class="form-label">Assign Role</label>
+                        <select id="RoleName" name="RoleName" class="form-select">
+                            <option value="Employee">Employee</option>
+                            <option value="HR Manager">HR</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        const employeeModalElement = document.getElementById('employeeListModal');
+        let employeeModalInstance = null;
+
+        const userModalElement = document.getElementById('userListModal');
+        let userModalInstance = null;
+
+        
+        function showEmployeeList(event) {
+            if (event) { event.preventDefault(); }
+            if (!employeeModalInstance) {
+                if (typeof bootstrap !== 'undefined') {
+                    employeeModalInstance = new bootstrap.Modal(employeeModalElement);
+                } else {
+                    console.error("Bootstrap 5 JavaScript is not loaded. Cannot show modal.");
+                    return;
+                }
+            }
+            employeeModalInstance.show();
+        }
+
+        function showUserList() {
+            if (!userModalInstance) {
+                if (typeof bootstrap !== 'undefined') {
+                    userModalInstance = new bootstrap.Modal(userModalElement);
+                } else {
+                    console.error("Bootstrap 5 JavaScript is not loaded. Cannot show modal.");
+                    return;
+                }
+            }
+            userModalInstance.show();
+        }
+
+        
+        employeeModalElement.addEventListener('hidden.bs.modal', function () {
+            const backdrops = document.getElementsByClassName('modal-backdrop');
+            for (let i = 0; i < backdrops.length; i++) {
+                backdrops[i].remove();
+            }
+            document.body.style.overflow = 'auto';
+            document.body.classList.remove('modal-open');
+        });
+
+        userModalElement.addEventListener('hidden.bs.modal', function () {
+            const backdrops = document.getElementsByClassName('modal-backdrop');
+            for (let i = 0; i < backdrops.length; i++) {
+                backdrops[i].remove();
+            }
+            document.body.style.overflow = 'auto';
+            document.body.classList.remove('modal-open');
+        });
+
+    </script>
+}

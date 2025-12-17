@@ -1,0 +1,288 @@
+﻿@model fyphrms.Models.EmployeeUserCreationViewModel
+@{
+    ViewData["Title"] = "Add New Employee";
+    Layout = "_Layout"; 
+}
+
+<link rel="stylesheet" href="~/css/HR/add-employee.css" asp-append-version="true" />
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 fw-bold">Add New Employee</h1>
+</div>
+
+<div class="card shadow-sm add-employee-form-card">
+    <div class="card-body p-4">
+        <form asp-action="HRAddEmployee" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+            <div class="form-section-header">System Account Details</div>
+            <div class="alert alert-info small py-2 mb-4" role="alert">
+                The temporary account password is automatically set to <strong>1234Abc!!</strong> and does not require manual entry.
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="RoleName" class="form-label"></label>
+                        <select asp-for="RoleName" asp-items="Model.AvailableRoles" class="form-select">
+                            <option value="">-- Select Role --</option>
+                        </select>
+                        <span asp-validation-for="RoleName" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4" style="display:none;">
+                <div class="col-md-6">
+                    <input asp-for="Password" type="hidden" value="1234Abc!!" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <input asp-for="ConfirmPassword" type="hidden" value="1234Abc!!" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="form-section-header">Personal Details</div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="ICNumber" class="form-label">IC (010101-1-1001)</label>
+                        <input asp-for="ICNumber" class="form-control" id="ICNumberInput" oninput="extractDOBFromIC()" />
+                        <span asp-validation-for="ICNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="ProfilePictureFile" class="form-label">Profile Picture </label>
+                        <input asp-for="ProfilePictureFile" class="form-control" type="file" accept="image/*" />
+                        <span asp-validation-for="ProfilePictureFile" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="DateOfBirth" class="form-label"></label>
+                        <input asp-for="DateOfBirth" id="DateOfBirthInput" class="form-control" type="date" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Gender" class="form-label"></label>
+                        <select asp-for="Gender" class="form-select">
+                            <option value="">-- Select Gender --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="ContactNumber" class="form-label"></label>
+                        <input asp-for="ContactNumber" class="form-control" />
+                        <span asp-validation-for="ContactNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label"></label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section-header">Employment Details</div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="BasicSalary" class="form-label"></label>
+                        <input asp-for="BasicSalary" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="BasicSalary" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="JoinDate" class="form-label"></label>
+                        <input asp-for="JoinDate" class="form-control" type="date" />
+                        <span asp-validation-for="JoinDate" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="EmploymentType" class="form-label"></label>
+                        <select asp-for="EmploymentType" class="form-select">
+                            <option value="">-- Select Type --</option>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                        </select>
+                        <span asp-validation-for="EmploymentType" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="DepartmentID" class="form-label"></label>
+                        <select asp-for="DepartmentID"
+                                asp-items="@(new SelectList(Model.Departments, "DepartmentID", "DepartmentName"))"
+                                class="form-select"
+                                id="DepartmentDropdown"
+                                onchange="loadPositions(this.value)">
+                            <option value="">-- Select Department --</option>
+                        </select>
+                        <span asp-validation-for="DepartmentID" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="PositionID" class="form-label"></label>
+                        <select asp-for="PositionID"
+                                class="form-select"
+                                id="PositionDropdown"
+                                disabled>
+                            <option value="">-- Select Position --</option>
+                        </select>
+                        <span asp-validation-for="PositionID" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary create-employee-btn">
+                    <i class="fas fa-user-plus me-2"></i> Create Employee
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function extractDOBFromIC() {
+            const icInput = document.getElementById('ICNumberInput');
+            const dobInput = document.getElementById('DateOfBirthInput');
+
+            
+            const icValue = icInput.value.replace(/[^0-9]/g, '');
+            const dobSegment = icValue.substring(0, 6);
+
+            
+            if (dobSegment.length === 6) {
+                const yearPart = parseInt(dobSegment.substring(0, 2), 10);
+                const monthPart = dobSegment.substring(2, 4);
+                const dayPart = dobSegment.substring(4, 6);
+
+                
+                const currentYear = new Date().getFullYear();
+                const currentYearLastTwoDigits = currentYear % 100;
+                let fullYear;
+
+                if (yearPart <= currentYearLastTwoDigits) {
+                    fullYear = 2000 + yearPart;
+                } else {
+                    fullYear = 1900 + yearPart;
+                }
+
+                
+                const dateString = `${fullYear}-${monthPart}-${dayPart}`;
+
+                
+                const dateCheck = new Date(dateString);
+
+                
+                if (dateCheck instanceof Date && !isNaN(dateCheck) && dateCheck.getFullYear() == fullYear) {
+                    dobInput.value = dateString;
+                } else {
+                    
+                    dobInput.value = '';
+                }
+
+            } else {
+                
+                dobInput.value = '';
+            }
+        }
+
+        
+        function loadPositions(departmentId) {
+            var positionDropdown = $('#PositionDropdown');
+            positionDropdown.empty(); 
+            positionId = positionDropdown.val(); /
+            positionDropdown.append('<option value="">-- Loading Positions... --</option>');
+            positionDropdown.prop('disabled', true); 
+
+            if (departmentId === "") {
+                positionDropdown.empty();
+                positionDropdown.append('<option value="">-- Select Position --</option>');
+                return;
+            }
+
+            /
+            $.ajax({
+                url: '@Url.Action("GetPositionsByDepartment", "HR")',
+                type: 'GET',
+                data: { departmentId: departmentId },
+                success: function (data) {
+                    positionDropdown.empty();
+                    positionDropdown.append('<option value="">-- Select Position --</option>');
+
+                    if (data.length === 0) {
+                        positionDropdown.append('<option value="" disabled>No positions available</option>');
+                    } else {
+                        $.each(data, function (index, item) {
+                            positionDropdown.append($('<option>', {
+                                value: item.positionID,
+                                text: item.positionTitle,
+                                
+                                selected: item.positionID == positionId
+                            }));
+                        });
+                        positionDropdown.prop('disabled', false); 
+                    }
+                },
+                error: function (xhr, status, error) {
+                    positionDropdown.empty();
+                    positionDropdown.append('<option value="" disabled>Error loading positions</option>');
+                    console.error("AJAX Error: ", status, error);
+                }
+            });
+        }
+    </script>
+}

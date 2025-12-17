@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div id="tempdata-alert-container">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success floating-alert fade show" role="alert">
+                    <strong>Success!</strong> @Html.Raw(TempData["SuccessMessage"])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger floating-alert fade show" role="alert">
+                    <strong>Error!</strong> @Html.Raw(TempData["ErrorMessage"])
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+        </div>
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="text-primary">HRMS Portal</h3>
+                <div class="user-info">
+                    <small>@User.Identity.Name</small><br />
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <span class="badge bg-primary">Admin</span>
+                    }
+                    @if (User.IsInRole("HR Manager"))
+                    {
+                        <span class="badge bg-success">HR</span>
+                    }
+                    @if (User.IsInRole("Employee"))
+                    {
+                        <span class="badge bg-info text-dark">Employee</span>
+                    }
+                </div>
+            </div>
+
+            <ul class="nav flex-column">
+
+
+                
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Employee" asp-action="Index">
+                            <i class="fas fa-users"></i> Employee
+                        </a>
+                    </li>
+                }
+
+                @if (User.IsInRole("HR Manager"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="HR" asp-action="Index">
+                            <i class="fas fa-wallet"></i> DashBoard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="HR" asp-action="HRAttendanceManagement">
+                            <i class="fa-solid fa-clock"></i> Attendance
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="HR" asp-action="HREmployee">
+                            <i class="fas fa-users"></i> Employee
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="HR" asp-action="HRLeaveManagement">
+                            <i class="fas fa-calendar-alt"></i> Leave
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="HR" asp-action="HRPayrollManagement">
+                            <i class="fas fa-wallet"></i> Payroll
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="HR" asp-action="HRClaimManagement">
+                            <i class="fas fa-dollar-sign"></i> Claim
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="HR" asp-action="HRReportManagement">
+                            <i class="fas fa-bar-chart"></i> Report
+                        </a>
+                    </li>
+                }
+
+                @if (User.IsInRole("Employee"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Employee" asp-action="Index">
+                            <i class="fa fa-home"></i> DashBoard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Employee" asp-action="EmployeeAttendance">
+                            <i class="fa-solid fa-clock"></i> Clock-In & Clock-Out
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Employee" asp-action="EmployeeLeaveApplication">
+                            <i class="fas fa-calendar-alt"></i> Leave Application
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Employee" asp-action="EmployeePayroll">
+                            <i class="fas fa-wallet"></i> Payroll
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Employee" asp-action="EmployeeEClaimApplication">
+                            <i class="fas fa-dollar-sign"></i> Claim
+                        </a>
+                    </li>
+                }
+
+
+                <li class="nav-item mt-auto">
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-flex">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="nav-link bg-transparent border-0 w-100 text-start text-danger">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="main-content">
+            @RenderBody()
+        </div>
+
+        <script src="~/js/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        @RenderSection("Scripts", required: false)
+
+        <script>
+            $(document).ready(function () {
+                // Select all elements with the class 'floating-alert'
+                var alerts = $('.floating-alert');
+
+                if (alerts.length) {
+                    // Start a timer to fade out and close the alert after 5000 milliseconds (5 seconds)
+                    setTimeout(function () {
+                        alerts.fadeOut(500, function () {
+                            $(this).alert('close');
+                        });
+                    }, 5000); // 5 seconds
+                }
+            });
+        </script>
+
+    }
+    else
+    {
+        @RenderBody()
+    }
+
+</body>
+</html>

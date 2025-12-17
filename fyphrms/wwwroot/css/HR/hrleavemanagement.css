@@ -1,0 +1,392 @@
+﻿/* Typography & Colors */
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.text-gray-900 {
+    color: #1f2937;
+}
+
+.text-gray-800 {
+    color: #374151;
+}
+
+.text-gray-700 {
+    color: #4b5563;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+.text-gray-500 {
+    color: #6b7280;
+}
+
+.text-white {
+    color: white;
+}
+
+/* Layout & Spacing */
+.p-6 {
+    padding: 1.5rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.pb-4 {
+    padding-bottom: 1rem;
+}
+
+.mr-3 {
+    margin-right: 0.75rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.rounded {
+    border-radius: 0.25rem;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-inner {
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.bg-gray-50 {
+    background-color: #f9fafb;
+}
+
+.flex {
+    display: flex;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.space-x-3 > * + * {
+    margin-left: 0.75rem;
+}
+
+.border-b {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.max-w-xs {
+    max-width: 20rem;
+}
+
+/* Table */
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.min-w-full {
+    min-width: 100%;
+}
+
+.divide-y > * + * {
+    border-top-width: 1px;
+}
+
+.divide-gray-200 > * + * {
+    border-color: #e5e7eb;
+}
+
+.bg-gray-200 {
+    background-color: #e5e7eb;
+}
+
+.px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+
+/* Status Badges */
+.px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+.leading-5 {
+    line-height: 1.25rem;
+}
+
+.rounded-full {
+    border-radius: 9999px;
+}
+
+.inline-flex {
+    display: inline-flex;
+}
+
+.bg-green-100 {
+    background-color: #d1fae5;
+}
+
+.text-green-800 {
+    color: #065f46;
+}
+
+.bg-yellow-100 {
+    background-color: #fffbe6;
+}
+
+.text-yellow-800 {
+    color: #92400e;
+}
+
+.bg-red-100 {
+    background-color: #fee2e2;
+}
+
+.text-red-800 {
+    color: #991b1b;
+}
+
+/* Messages & Alerts */
+.border {
+    border-width: 1px;
+}
+
+.border-green-400 {
+    border-color: #34d399;
+}
+
+.text-green-700 {
+    color: #047857;
+}
+
+.border-red-400 {
+    border-color: #f87171;
+}
+
+.text-red-700 {
+    color: #b91c1c;
+}
+
+.relative {
+    position: relative;
+}
+
+/* -------------------------------------------------- */
+/* --- Filter Buttons (Targeting the links in the space-x-3 div) --- */
+/* -------------------------------------------------- */
+.space-x-3 a {
+    text-decoration: none !important; /* REMOVES UNDERLINE for filter buttons */
+    display: inline-block; /* Treat the link like a block element for button styling */
+}
+
+/* Filter Button Styling */
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.transition-colors {
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.bg-indigo-600 {
+    background-color: #4f46e5;
+}
+
+.hover\:bg-indigo-700:hover {
+    background-color: #4338ca;
+}
+
+.bg-gray-100 {
+    background-color: #f3f4f6;
+}
+
+.hover\:bg-gray-200:hover {
+    background-color: #e5e7eb;
+}
+
+/* -------------------------------------------------- */
+/* --- ACTION BUTTON STYLES (MODIFIED) --- */
+/* -------------------------------------------------- */
+
+/* Base style for all action buttons/links in the table */
+.action-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    text-decoration: none !important;
+    transition: background-color 0.15s ease-in-out;
+    margin-right: 0.5rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+    /* 1. View Details Button (Primary Color) */
+    .action-button.text-indigo-600 {
+        color: #4f46e5;
+        background-color: #eef2ff;
+        border-color: #a5b4fc;
+    }
+
+        .action-button.text-indigo-600:hover {
+            color: white;
+            background-color: #4f46e5;
+        }
+
+    /* 2. Approve Button */
+    .action-button.text-green-600 {
+        color: #059669;
+        background-color: #d1fae5;
+        border-color: #34d399;
+    }
+
+        .action-button.text-green-600:hover {
+            color: white;
+            background-color: #059669;
+        }
+
+    /* 3. Reject Button */
+    .action-button.text-red-600 {
+        color: #dc2626;
+        background-color: #fee2e2;
+        border-color: #f87171;
+        margin-right: 0;
+    }
+
+        .action-button.text-red-600:hover {
+            color: white;
+            background-color: #dc2626;
+        }
+
+/* Ensures form buttons inherit the action-button style correctly */
+.inline-block button {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    text-decoration: none !important;
+    transition: background-color 0.15s ease-in-out;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+    /* Apply color overrides to the form buttons */
+    .inline-block button.text-green-600 {
+        color: #059669;
+        background-color: #d1fae5;
+        border: 1px solid #34d399;
+    }
+
+    .inline-block button.text-red-600 {
+        color: #dc2626;
+        background-color: #fee2e2;
+        border: 1px solid #f87171;
+        margin-right: 0;
+    }
+
+    .inline-block button.text-green-600:hover {
+        color: white;
+        background-color: #059669;
+    }
+
+    .inline-block button.text-red-600:hover {
+        color: white;
+        background-color: #dc2626;
+    }

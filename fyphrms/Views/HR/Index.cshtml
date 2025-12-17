@@ -1,0 +1,125 @@
+﻿@using fyphrms.Models.HR
+@model HRDashboardViewModel
+@{
+    ViewData["Title"] = "HR Dashboard";
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/HR/hr-dashboard.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<div class="main-content-wrapper">
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 fw-bold">HR Dashboard</h1>
+    <span class="text-muted small">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="p-4 rounded shadow-sm hr-hero-banner">
+            <h2 class="mb-1">Hello, @(Model.UserName ?? "HR")! 👋</h2>
+            <p class="lead mb-3">HR</p>
+            <a href="@Url.Action("MyProfile", "Employee")" class="btn btn-light fw-bold">
+                View My Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+
+    <div class="col-lg-4 col-md-6">
+            <a href="@Url.Action("HREmployee", "HR")" class="text-decoration-none">
+                <div class="card metric-card employee-card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-end mb-3">
+                                <h6 class="text-secondary fw-bold text-uppercase mb-0">Total Employees</h6>
+                                <i class="fas fa-users fa-2x text-primary-dark"></i>
+                            </div>
+                            <div class="d-flex align-items-end">
+                                <h2 class="display-5 fw-bolder me-3 text-primary-dark">@(Model.TotalEmployees)</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </a>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+            <a href="@Url.Action("HRLeaveManagement", "HR")" class="text-decoration-none">
+                <div class="card metric-card leave-card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-end mb-3">
+                                <h6 class="text-secondary fw-bold text-uppercase mb-0">Pending Leave Requests</h6>
+                                <i class="fas fa-calendar-check fa-2x text-warning-dark"></i>
+                            </div>
+                            <div class="d-flex align-items-end">
+                                <h2 class="display-5 fw-bolder me-3 text-warning-dark">@(Model.PendingLeaves)</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </a>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+            <a href="@Url.Action("HRClaimManagement", "HR")" class="text-decoration-none">
+                <div class="card metric-card claim-card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-end mb-3">
+                                <h6 class="text-secondary fw-bold text-uppercase mb-0">Pending Claims</h6>
+                                <i class="fas fa-dollar-sign fa-2x text-info-dark"></i>
+                            </div>
+                            <div class="d-flex align-items-end">
+                                <h2 class="display-5 fw-bolder me-3 text-info-dark">@(Model.PendingClaims)</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </a>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold h5">
+                Upcoming Holidays
+            </div>
+            <div class="card-body">
+                @if (Model.UpcomingHolidays != null && Model.UpcomingHolidays.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var holiday in Model.UpcomingHolidays)
+                        {
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="far fa-calendar-alt me-3 holiday-icon"></i>
+                                <div>
+                                    <p class="mb-0 fw-bold">@holiday.Name</p>
+                                    <small class="text-muted">@holiday.Date.ToString("dddd, dd MMMM yyyy")</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                        <a class="btn btn-primary mt-3" asp-action="HRHolidays" asp-controller="HR">
+                            View All Holidays
+                        </a>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No upcoming holidays scheduled.</p>
+                }
+                    
+            </div>
+                
+        </div>
+    </div>
+</div>
+</div>
+@section Scripts {
+    
+}

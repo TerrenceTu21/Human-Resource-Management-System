@@ -1,0 +1,164 @@
+﻿@using fyphrms.Models.Employees
+@model EmployeePayslipDetailViewModel
+
+@{
+    ViewData["Title"] = "Payslip - " + Model.MonthYearDisplay;
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/Employee/payslip-detail.css" asp-append-version="true" />
+
+<div class="payslip-page-container">
+
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 print-hide">
+        <h2 class="text-dark">Payslip Detail</h2>
+        <div>
+            <a asp-action="EmployeePayroll" class="btn btn-secondary mr-2">
+                <i class="fas fa-arrow-left"></i> Back to History
+            </a>
+            <button onclick="window.print()" class="btn btn-primary btn-print">
+                <i class="fas fa-print"></i> Print Payslip
+            </button>
+        </div>
+    </div>
+
+    <div class="payslip-document shadow-lg">
+
+        
+        <div class="payslip-header mb-4">
+            <h1 class="payslip-title">Salary Slip</h1>
+            <p class="payslip-period">For the Month of <strong>@Model.MonthYearDisplay</strong></p>
+            <div class="payslip-status @(Model.Status == "Paid" ? "paid" : "pending")">
+                @if (Model.Status == "Paid")
+                {
+                    <i class="fas fa-check-circle"></i>
+                    <span>Paid</span>
+                }
+                else
+                {
+                    <i class="fas fa-clock"></i>
+                    <span>Pending</span>
+                }
+            </div>
+        </div>
+
+        
+        <div class="payslip-section employee-details">
+            <h4 class="section-title">Employee Information</h4>
+            <div class="row">
+                <div class="col-md-6 detail-group">
+                    <label>Employee Name:</label>
+                    <span class="detail-value">@Model.EmployeeName</span>
+                </div>
+                <div class="col-md-6 detail-group">
+                    <label>IC/ID No.:</label>
+                    <span class="detail-value">@Model.EmployeeIC</span>
+                </div>
+                <div class="col-md-6 detail-group">
+                    <label>Position:</label>
+                    <span class="detail-value">@Model.EmployeePosition</span>
+                </div>
+                <div class="col-md-6 detail-group">
+                    <label>Department:</label>
+                    <span class="detail-value">@Model.EmployeeDepartment</span>
+                </div>
+                <div class="col-md-6 detail-group">
+                    <label>Payment Date:</label>
+                    <span class="detail-value">@(Model.PaymentDate.HasValue? Model.PaymentDate.Value.ToString("dd/MM/yyyy") : "N/A")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            
+            <div class="col-md-6 payslip-section financial-section earnings">
+                <h4 class="section-title">Earnings (RM)</h4>
+                <table class="table table-sm detail-table">
+                    <tbody>
+                        <tr>
+                            <td>Basic Salary</td>
+                            <td class="text-right">@Model.BasicSalary.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td>Allowance</td>
+                            <td class="text-right">@Model.Allowance.ToString("N2")</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td class="font-weight-bold">Gross Salary</td>
+                            <td class="text-right font-weight-bold">@Model.GrossSalary.ToString("N2")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            
+            <div class="col-md-6 payslip-section financial-section deductions">
+                <h4 class="section-title">Deductions (RM)</h4>
+                <table class="table table-sm detail-table">
+                    <tbody>
+                        <tr>
+                            <td>EPF Employee Contribution</td>
+                            <td class="text-right">@Model.EPFEmployee.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td>SOCSO Employee Contribution</td>
+                            <td class="text-right">@Model.SOCSOEmployee.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td>EIS Employee Contribution</td>
+                            <td class="text-right">@Model.EISEmployee.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td>PCB (Income Tax)</td>
+                            <td class="text-right">@Model.PCB.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td>Other Deductions (@Model.OtherDeductionDescription)</td>
+                            <td class="text-right">@Model.OtherDeductions.ToString("N2")</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td class="font-weight-bold">Total Deductions</td>
+                            <td class="text-right font-weight-bold">@Model.TotalDeductions.ToString("N2")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        
+        <div class="payslip-section employer-contributions mt-4">
+            <h4 class="section-title">Employer Contributions (RM)</h4>
+            <table class="table table-sm detail-table">
+                <tbody>
+                    <tr>
+                        <td>EPF Employer Contribution</td>
+                        <td class="text-right">@Model.EPFEmployer.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td>SOCSO Employer Contribution</td>
+                        <td class="text-right">@Model.SOCSOEmployer.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td>EIS Employer Contribution</td>
+                        <td class="text-right">@Model.EISEmployer.ToString("N2")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+        <div class="net-pay-summary">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="net-pay-label">Net Pay for the Month</h3>
+                <h3 class="net-pay-amount">RM @Model.NetSalary.ToString("N2")</h3>
+            </div>
+        </div>
+
+        <div class="payslip-footer mt-4">
+            <p class="text-muted text-center">This is a system generated document and does not require a signature.</p>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

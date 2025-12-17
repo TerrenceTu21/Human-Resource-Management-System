@@ -1,0 +1,141 @@
+﻿/* -------------------------------------------------- */
+/* PAYROLL MANAGEMENT PAGE — MATCHED THEME */
+/* -------------------------------------------------- */
+
+/* Page Title */
+.page-title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+/* Main Card */
+.payroll-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+
+/* Header Row (title + filters) */
+.payroll-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+}
+
+/* -------------------------------------------------- */
+/* CURRENT MONTH HIGHLIGHT */
+/* -------------------------------------------------- */
+.current-month-row {
+    background-color: #eef2ff !important; /* light indigo */
+}
+
+    .current-month-row:hover {
+        background-color: #e0e7ff !important;
+    }
+
+/* -------------------------------------------------- */
+/* TABLE STRUCTURE */
+/* -------------------------------------------------- */
+.payroll-table-container {
+    overflow-x: auto;
+}
+
+.payroll-table {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+    .payroll-table thead {
+        background-color: #f9fafb;
+    }
+
+    .payroll-table th {
+        text-align: left;
+        padding: 0.75rem 1.5rem;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b7280;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .payroll-table td {
+        padding: 1rem 1.5rem;
+        font-size: 0.875rem;
+        color: #374151;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+
+    /* Hover effect for rows */
+    .payroll-table tbody tr:hover {
+        background-color: #f3f4f6;
+    }
+
+/* -------------------------------------------------- */
+/* STATUS BADGES — ALIGNED WITH YOUR BADGE SYSTEM */
+/* -------------------------------------------------- */
+.status-badge {
+    display: inline-flex;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+}
+
+.status-paid {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-pending {
+    background-color: #fffbe6;
+    color: #92400e;
+}
+
+/* -------------------------------------------------- */
+/* ACTION BUTTON — “VIEW PAYSLIPS” */
+/* (Styled to match your .action-button rules) */
+/* -------------------------------------------------- */
+.view-payslip-btn {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    text-decoration: none !important;
+    color: #4f46e5;
+    background-color: #eef2ff;
+    border: 1px solid #a5b4fc;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+    .view-payslip-btn:hover {
+        color: white;
+        background-color: #4f46e5;
+    }
+
+/* Remove underline for links inside tables */
+.payroll-table a {
+    text-decoration: none !important;
+}
+
+/* -------------------------------------------------- */
+/* EMPTY STATE MESSAGE */
+/* -------------------------------------------------- */
+.empty-message {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1rem;
+    color: #6b7280;
+}

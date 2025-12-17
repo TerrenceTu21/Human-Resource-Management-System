@@ -1,0 +1,98 @@
+﻿@model fyphrms.Models.Employees.EmployeeLeaveHistoryViewModel
+
+@{
+    ViewData["Title"] = "Leave History";
+    Layout = "_Layout"; 
+}
+
+<style>
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .status-Pending {
+        background-color: #ffc107; /* Yellow/Orange */
+        color: #343a40;
+    }
+
+    .status-Approved {
+        background-color: #28a745; /* Green */
+        color: white;
+    }
+
+    .status-Rejected {
+        background-color: #dc3545; /* Red */
+        color: white;
+    }
+
+    .action-link {
+        color: #007bff; 
+        text-decoration: none;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark">Leave History</h2>
+        <span class="text-secondary">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+
+    <div class="d-flex justify-content-end mb-4">
+        <a asp-action="EmployeeLeaveApplication" class="btn btn-primary">Back</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="mb-4 text-secondary">Leave History</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>TYPE</th>
+                        <th>DESCRIPTION</th>
+                        <th>START DATE</th>
+                        <th>END DATE</th>
+                        <th>DAYS</th>
+                        <th>COMMENT</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.HistoryRecords.Any())
+                    {
+                        @foreach (var record in Model.HistoryRecords)
+                        {
+                            <tr>
+                                <td>@record.ID</td>
+                                <td>@record.LeaveType</td>
+                                <td>@record.Reason</td>
+                                <td>@record.StartDate.ToString("yyyy-MM-dd")</td>
+                                <td>@record.EndDate.ToString("yyyy-MM-dd")</td>
+                                <td>@record.Days</td>
+                                <td>@record.RejectReason</td>
+                                <td>
+                                    <span class="status-badge status-@record.Status">
+                                        @record.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No leave history found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,102 @@
+﻿@using fyphrms.Models.HR
+@model HRViewPayslipViewModel
+
+@{
+    ViewData["Title"] = "Payslips for " + Model.MonthYearDisplay;
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/HR/hrleavemanagement.css" asp-append-version="true" />
+
+<div class="p-6 bg-white rounded-lg shadow-lg">
+
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">
+        Employee Payslips for @Model.MonthYearDisplay
+    </h1>
+
+    <div class="bg-white p-6 rounded-xl shadow-lg">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>@Model.MonthYearDisplay</h3>
+
+            @if (Model.EmployeePayslips.Any(p => p.IsSimulated))
+            {
+                <form id="processPayrollForm" method="post" asp-action="ProcessPayroll">
+                    <input type="hidden" name="month" value="@Model.EmployeePayslips.First().Month" />
+                    <input type="hidden" name="year" value="@Model.EmployeePayslips.First().Year" />
+                    <button type="button" class="btn btn-primary" onclick="confirmProcessPayroll()">
+                        Process Payroll
+                    </button>
+                </form>
+            }
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Employee Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Basic Salary (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Allowances (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">EPF Employee (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">EPF Employer (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SOCSO Employee (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SOCSO Employer (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">EIS Employee (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">EIS Employer (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">PCB (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Other Deductions (RM)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Net Pay (RM)</th>
+                    </tr>
+                </thead>
+
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach (var payslip in Model.EmployeePayslips)
+                    {
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@payslip.EmployeeName</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.BasicSalary.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.Allowances.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.EPFEmployee.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.EPFEmployer.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.SOCSOEmployee.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.SOCSOEmployer.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.EISEmployee.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.EISEmployer.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.PCB.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @payslip.Deductions.ToString("N2")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">RM @payslip.NetSalary.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="bg-gray-100 font-bold">
+                    <tr>
+                        <td colspan="10" class="px-6 py-4 text-right">Total Net Pay (RM):</td>
+                        <td class="px-6 py-4">RM @Model.EmployeePayslips.Sum(p => p.NetSalary).ToString("N2")</td>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmProcessPayroll() {
+        Swal.fire({
+            title: "Process Payroll?",
+            text: "This will create payroll records for all employees.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, process now"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("processPayrollForm").submit();
+            }
+        });
+    }
+</script>

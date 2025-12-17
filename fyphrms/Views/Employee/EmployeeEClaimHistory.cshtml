@@ -1,0 +1,108 @@
+﻿@model fyphrms.Models.Employees.EClaimHistoryViewModel
+
+@{
+    ViewData["Title"] = "E-Claim History";
+    Layout = "_Layout"; 
+}
+
+<style>
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .status-Pending {
+        background-color: #ffc107; /* Yellow/Orange */
+        color: #343a40;
+    }
+
+    .status-Approved {
+        background-color: #28a745; /* Green */
+        color: white;
+    }
+
+    .status-Rejected {
+        background-color: #dc3545; /* Red */
+        color: white;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark">E Claim</h2>
+        <span class="text-secondary">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+
+    <div class="d-flex justify-content-end mb-4">
+        <a asp-action="EmployeeEClaimApplication" class="btn btn-info text-white shadow-sm">Back to Application</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="mb-4 text-secondary">E-Claim History</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>DESCRIPTION</th>
+                        <th>AMOUNT</th>
+                        <th>EXPENSES DATE</th>
+                        <th>SUBMITTED DATE</th>
+                        <th>PROOF</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.HistoryRecords.Any())
+                    {
+                        @foreach (var record in Model.HistoryRecords)
+                        {
+                            <tr>
+                                <td>@record.ID</td>
+                                <td>@record.Type</td>
+                                <td>RM @record.Amount.ToString("F2")</td>
+                                <td>@record.ExpensesDate.ToString("yyyy-MM-dd")</td>
+                                <td>@record.ClaimDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(record.ProofFilePath) && record.ProofFilePath != "#")
+                                    {
+                                        <a href="@record.ProofFilePath" target="_blank" class="text-info">
+                                            @record.ProofFileName
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="status-badge status-@record.Status">
+                                        @record.Status
+                                    </span>
+                                </td>
+                                <!--
+                                    <td>
+                                        <a href="#" class="action-link">View Details</a>
+                                    </td>
+                                -->
+                                
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No E-Claim history found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

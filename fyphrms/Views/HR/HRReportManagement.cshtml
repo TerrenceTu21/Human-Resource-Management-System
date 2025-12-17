@@ -1,0 +1,193 @@
+﻿@using fyphrms.Models.HR
+@model HRReportViewModel
+@using System.Globalization;
+
+@{
+    ViewData["Title"] = "HR Report Management";
+}
+
+
+<link rel="stylesheet" href="~/css/HR/hr-report.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-2 bg-light p-3">
+            <h5>Reports</h5>
+            <div class="d-grid gap-2">
+                <a asp-action="HRReportManagement" asp-route-report="Attendance"
+                   class="btn @(Model.SelectedReport == "Attendance" ? "btn-primary" : "btn-outline-primary")">
+                    Attendance Analytics
+                </a>
+
+                <a asp-action="HRReportManagement" asp-route-report="Leave"
+                   class="btn @(Model.SelectedReport == "Leave" ? "btn-primary" : "btn-outline-primary")">
+                    Leave Analytics
+                </a>
+
+                <a asp-action="HRReportManagement" asp-route-report="Claim"
+                   class="btn @(Model.SelectedReport == "Claim" ? "btn-primary" : "btn-outline-primary")">
+                    Claim Analytics
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-10 p-3" id="print-area">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>@Model.SelectedReport Analytics</h4>
+                <button class="btn btn-success" onclick="window.print()">Print Report</button>
+            </div>
+
+            <form method="get" asp-action="HRReportManagement" class="row g-2 mb-3">
+                <input type="hidden" name="report" value="@Model.SelectedReport" />
+
+                <div class="col-md-3">
+                    <label>Month</label>
+                    <select name="month" class="form-select">
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m" selected="@(Model.SelectedMonth == m)">
+                                @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                            </option>
+                        }
+                    </select>
+                </div>
+
+
+                <div class="col-md-3">
+                    <label>Year</label>
+                    <select name="year" class="form-select">
+                        @for (int y = DateTime.Now.Year - 5; y <= DateTime.Now.Year; y++)
+                        {
+                            <option value="@y" selected="@(Model.SelectedYear == y)">
+                                @y
+                            </option>
+                        }
+                    </select>
+                </div>
+
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+
+            <div class="card p-3 shadow-sm">
+
+                @if (Model.SelectedReport == "Attendance")
+                {
+                    <canvas id="attendanceChart"></canvas>
+                    <script>
+                        new Chart(document.getElementById('attendanceChart'), {
+                            type: 'bar',
+                            data: {
+                                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AttendanceData.Select(d => d.Month))),
+                                datasets: [
+                                    {
+                                        label: 'Present Days',
+                                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AttendanceData.Select(d => d.PresentDays))),
+                                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                                    },
+                                    {
+                                        label: 'Absent Days',
+                                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AttendanceData.Select(d => d.AbsentDays))),
+                                        backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                                    }
+                                ]
+                            }
+                        });
+                    </script>
+                }
+
+                else if (Model.SelectedReport == "Leave")
+                {
+                    <canvas id="leaveChart"></canvas>
+
+                    <script>
+                        var leaveCtx = document.getElementById('leaveChart').getContext('2d');
+
+                        var leaveLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeaveData.Select(l => l.LeaveType)));
+                        var leaveValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeaveData.Select(l => l.TotalTaken)));
+
+                        // Generate a unique color for each leave type
+                        var leaveColors = leaveLabels.map((_, i) => {
+                            const colors = [
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(255, 159, 64, 0.7)',
+                                'rgba(153, 102, 255, 0.7)',
+                                'rgba(255, 205, 86, 0.7)',
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(201, 203, 207, 0.7)',
+                                'rgba(255, 99, 132, 0.7)'
+                            ];
+                            return colors[i % colors.length];
+                        });
+
+                        new Chart(leaveCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: leaveLabels,
+                                datasets: [{
+                                    label: 'Total Leave Taken',
+                                    data: leaveValues,
+                                    backgroundColor: leaveColors,
+                                    borderColor: leaveColors.map(c => c.replace('0.7', '1')),
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                plugins: {
+                                    legend: { display: false }
+                                },
+                                responsive: true,
+                                scales: {
+                                    y: { 
+                                        beginAtZero: true,
+                                        title: {
+                                        display: true,
+                                        text: 'Days Taken',   
+                                        font: {
+                                            size: 14,
+                                            weight: 'bold'
+                                            }
+                                        }
+                                    },
+                                    x:{
+                                        title: {
+                                        display: true,
+                                        text: 'Leave Type',
+                                        font: {
+                                            size: 14,
+                                            weight: 'bold'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                }
+
+                else if (Model.SelectedReport == "Claim")
+                {
+                    <canvas id="claimChart"></canvas>
+                    <script>
+                        new Chart(document.getElementById('claimChart'), {
+                            type: 'pie',
+                            data: {
+                                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EClaimData.Select(c => c.Status))),
+                                datasets: [{
+                                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EClaimData.Select(c => c.Count))),
+                                    backgroundColor: ['#36A2EB', '#4BC0C0', '#FF6384']
+                                }]
+                            }
+                        });
+                    </script>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

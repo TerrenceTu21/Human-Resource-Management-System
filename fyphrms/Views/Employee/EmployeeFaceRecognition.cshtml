@@ -1,0 +1,250 @@
+﻿@{
+    ViewData["Title"] = "Face Recognition Clock-in";
+}
+
+@Html.AntiForgeryToken()
+
+<style>
+    .recognition-container {
+        max-width: 650px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .camera-frame {
+        width: 100%;
+        max-width: 480px;
+        margin: 20px auto;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    video, canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+    }
+
+    .placeholder-content {
+        color: #999;
+        font-size: 1.1rem;
+    }
+
+    .action-message {
+        margin: 15px 0 25px 0;
+        font-size: 1.1rem;
+        color: #555;
+    }
+
+    .rec-btn {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 auto;
+        background-color: #3f51b5; /* Indigo/Blue */
+        color: white;
+    }
+
+        .rec-btn:hover:not(:disabled) {
+            background-color: #303f9f;
+        }
+
+        .rec-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+    
+    #message-box {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        display: none;
+        font-weight: 500;
+    }
+
+    .success {
+        background-color: #e6ffe6;
+        color: #4CAF50;
+        border: 1px solid #4CAF50;
+    }
+
+    .error {
+        background-color: #ffe6e6;
+        color: #f44336;
+        border: 1px solid #f44336;
+    }
+
+    .info {
+        background-color: #eef5ff;
+        color: #335599;
+        border: 1px solid #99bbea;
+    }
+
+</style>
+
+<div class="recognition-container">
+    <h2 id="page-title"></h2>
+
+    <div class="camera-frame">
+        <video id="videoFeed" autoplay playsinline></video>
+        
+        <canvas id="captureCanvas" style="display: none;"></canvas>
+        <div id="placeholder" class="placeholder-content">
+            <i class="fas fa-camera fa-3x"></i>
+            <p>Camera Feed Placeholder</p>
+        </div>
+    </div>
+
+    <p id="mode-note" class="action-message"></p>
+
+    <button id="recognize-btn" class="rec-btn" disabled>
+        <i class="fas fa-user-check"></i> <span id="btn-text"></span>
+    </button>
+
+    <button id="cancel-btn" class="mt-4 text-gray-500 hover:text-gray-700" onclick="window.location.href='@Url.Action("EmployeeAttendance", "Employee")'">
+        Cancel
+    </button>
+
+    <div id="message-box"></div>
+</div>
+
+@section Scripts {
+    <script>
+        
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        const mode = (getQueryParam('mode') || 'ClockIn'); 
+
+        document.getElementById('btn-text').textContent =
+            mode.toLowerCase() === 'clockout'
+                ? 'Recognize Face & Clock Out'
+                : 'Recognize Face & Clock In';
+
+        document.getElementById('page-title').textContent =
+            mode.toLowerCase() === 'clockout'
+                ? 'Face Recognition Clock-Out'
+                : 'Face Recognition Clock-In';
+
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('captureCanvas');
+        const placeholder = document.getElementById('placeholder');
+        const recognizeBtn = document.getElementById('recognize-btn');
+        const messageBox = document.getElementById('message-box');
+        const modeNote = document.getElementById('mode-note');
+
+        let stream = null;
+
+        
+        modeNote.textContent =
+            mode.toLowerCase() === 'clockout'
+                ? 'You are attempting to clock out. Please look at the camera for verification.'
+                : 'Please look directly at the camera to clock in.';
+
+        function showMessage(type, message) {
+            messageBox.className = '';
+            messageBox.style.display = 'block';
+
+            if (type) messageBox.classList.add(type);
+            messageBox.textContent = message;
+        }
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { width: 480, height: 360 } });
+                video.srcObject = stream;
+
+                video.onloadedmetadata = () => {
+                    video.play();
+                    placeholder.style.display = 'none';
+                    recognizeBtn.disabled = false;
+
+                    showMessage(
+                        'success',
+                        mode.toLowerCase() === 'clockout'
+                            ? 'Camera is ready. Click "Recognize Face" to clock out.'
+                            : 'Camera is ready. Click "Recognize Face" to clock in.'
+                    );
+                };
+
+            } catch (err) {
+                console.error("Camera error:", err);
+                placeholder.innerHTML = '<i class="fas fa-times-circle fa-3x"></i><p>Camera access denied or blocked.</p>';
+                recognizeBtn.disabled = true;
+                showMessage('error', 'Unable to start camera. Please check permissions.');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        async function captureAndSubmit() {
+            recognizeBtn.disabled = true;
+            showMessage('info', 'Capturing image and verifying face...');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+
+            try {
+                const response = await fetch('@Url.Action("VerifyFaceAndProcess", "Employee")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ imageData: imageData, actionType: mode })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('success', result.message + ' Redirecting...');
+                    stopCamera();
+                    setTimeout(() => window.location.href = '@Url.Action("EmployeeAttendance", "Employee")', 1200);
+                } else {
+                    showMessage('error', result.message);
+                    recognizeBtn.disabled = false;
+                }
+
+            } catch (error) {
+                console.error("Submission failed:", error);
+                showMessage('error', 'An error occurred during submission. Please try again.');
+                recognizeBtn.disabled = false;
+            }
+        }
+
+        window.addEventListener('load', startCamera);
+        window.addEventListener('beforeunload', stopCamera);
+        recognizeBtn.addEventListener('click', captureAndSubmit);
+    </script>
+
+}

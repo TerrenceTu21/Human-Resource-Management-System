@@ -1,0 +1,295 @@
+﻿@model fyphrms.Models.Employees.EmployeeDashboardViewModel
+
+@{
+    ViewData["Title"] = "Employee Dashboard";
+    Layout = "_Layout";
+}
+
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+
+    .welcome-banner {
+        background-color: #6a5acd;
+        color: #fff;
+        border-radius: 10px;
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .welcome-banner h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .welcome-banner p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+    .quick-action-card {
+        text-align: center;
+        padding: 15px 10px;
+        border-radius: 8px;
+        transition: transform 0.2s;
+        min-height: 100px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+        .quick-action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-action-card i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+    .action-leave {
+        color: #007bff;
+    }
+
+    .action-payslip {
+        color: #28a745;
+    }
+
+    .action-clock {
+        color: #ffc107;
+    }
+
+    .action-eclaim {
+        color: #6a5acd;
+    }
+
+    .summary-card, .holiday-card {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        height: 100%;
+    }
+
+    .leave-balance-item {
+        border-bottom: 1px dashed #eee;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+        .leave-balance-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+    .days-remaining-badge {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #6a5acd;
+    }
+
+    .holiday-item {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+        .holiday-item:last-child {
+            border-bottom: none;
+        }
+
+        .holiday-item i {
+            font-size: 1.2rem;
+            color: #007bff;
+            margin-right: 15px;
+        }
+</style>
+
+<div class="dashboard-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-dark">Dashboard</h4>
+        <span class="text-secondary">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+
+    <div class="welcome-banner">
+        <h1>Hello, @Model.FullName! 👋</h1>
+        <p>@Model.PositionTitle</p>
+        <a asp-controller="Account" asp-action="Profile" class="btn btn-light shadow-sm">View My Profile</a>
+    </div>
+
+    <div class="row">
+
+        
+        <div class="col-lg-3 col-md-12 mb-4">
+            <h5 class="text-secondary mb-3">Quick Actions</h5>
+            <div class="row g-3">
+                <div class="col-6 col-md-12">
+                    <a asp-controller="Employee" asp-action="EmployeeLeaveApplication" class="quick-action-card d-block bg-light text-decoration-none">
+                        <i class="fas fa-calendar-alt action-leave"></i>
+                        <p class="mb-0 text-sm text-dark">Apply Leave</p>
+                    </a>
+                </div>
+                <div class="col-6 col-md-12">
+                    <a asp-controller="Employee" asp-action="EmployeePayroll" class="quick-action-card d-block bg-light text-decoration-none">
+                        <i class="fas fa-file-invoice-dollar action-payslip"></i>
+                        <p class="mb-0 text-sm text-dark">View Payslip</p>
+                    </a>
+                </div>
+                <div class="col-6 col-md-12">
+                    <a asp-controller="Employee" asp-action="EmployeeAttendance" class="quick-action-card d-block bg-light text-decoration-none">
+                        <i class="fas fa-clock action-clock"></i>
+                        <p class="mb-0 text-sm text-dark">Clock-In & Clock-Out</p>
+                    </a>
+                </div>
+                <div class="col-6 col-md-12">
+                    <a asp-controller="Employee" asp-action="EmployeeEClaimApplication" class="quick-action-card d-block bg-light text-decoration-none">
+                        <i class="fas fa-dollar-sign action-eclaim"></i>
+                        <p class="mb-0 text-sm text-dark">Submit E-claim</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+            <h5 class="text-secondary mb-3">Leave Balances (@DateTime.Now.Year)</h5>
+            <div class="summary-card">
+                @if (Model.LeaveBalances != null && Model.LeaveBalances.Any())
+                {
+                    @foreach (var balance in Model.LeaveBalances)
+                    {
+                        <div class="d-flex justify-content-between align-items-center leave-balance-item">
+                            <div>
+                                <strong class="text-dark">@balance.LeaveType</strong>
+                                <p class="text-xs text-secondary mb-0">Total: @balance.TotalEntitlement | Used: @balance.DaysTaken</p>
+                            </div>
+                            <span class="days-remaining-badge">@balance.DaysRemaining</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-center text-muted py-3">No leave entitlements set for this year.</p>
+                }
+                <a asp-controller="Employee" asp-action="EmployeeLeaveApplication" class="btn btn-sm mt-3 text-white w-100" style="background-color: #6a5acd;">Request Leave</a>
+            </div>
+        </div>
+
+        
+        <div class="col-lg-5 col-md-6 mb-4">
+            <h5 class="text-secondary mb-3">E-Claim Summary</h5>
+            <div class="summary-card">
+                @if (Model.RecentClaims.Any())
+                {
+                    @foreach (var claim in Model.RecentClaims)
+                    {
+                        string statusClass = claim.Status.ToLower() switch
+                        {
+                            "approved" => "claim-status-approved",
+                            "pending" => "claim-status-pending",
+                            "rejected" => "claim-status-rejected",
+                            _ => "text-secondary"
+                        };
+
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-dark">@claim.Title</span>
+                            <span class="@statusClass">@claim.Status</span>
+                        </div>
+                        <p class="text-xs text-muted mb-3">Submitted: @claim.ClaimDate.ToString("yyyy-MM-dd")</p>
+                    }
+                    <a asp-controller="Employee" asp-action="EmployeeEClaimHistory" class="btn btn-sm btn-outline-secondary w-100 mt-2">View All Claims</a>
+                }
+                else
+                {
+                    <p class="text-center text-muted py-3">No recent claims found.</p>
+                }
+            </div>
+        </div>
+
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+            <h5 class="text-secondary mb-3">Upcoming Holidays</h5>
+            <div class="holiday-card">
+                @if (Model.UpcomingHolidays != null && Model.UpcomingHolidays.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var holiday in Model.UpcomingHolidays)
+                        {
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="far fa-calendar-alt me-3 holiday-icon"></i>
+                                <div>
+                                    <p class="mb-0 fw-bold">@holiday.Name</p>
+                                    <small class="text-muted">@holiday.Date.ToString("dddd, dd MMM yyyy")</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <button class="btn btn-sm mt-3 w-100" style="background-color:#6a5acd; color:white;"
+                            data-bs-toggle="modal" data-bs-target="#allHolidaysModal">
+                        View All Holidays
+                    </button>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No upcoming holidays scheduled.</p>
+                }
+            </div>
+        </div>
+
+    </div> <
+    
+    <div class="modal fade" id="allHolidaysModal" tabindex="-1" aria-labelledby="allHolidaysModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="allHolidaysModalLabel">All Holidays</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Holiday Name</th>
+                                <th>Date</th>
+                                <th>Day</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.AllHolidays != null && Model.AllHolidays.Any())
+                            {
+                                int i = 1;
+                                foreach (var holiday in Model.AllHolidays)
+                                {
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@holiday.Name</td>
+                                        <td>@holiday.Date.ToString("dd MMM yyyy")</td>
+                                        <td>@holiday.Date.ToString("dddd")</td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="4" class="text-center text-muted">No holidays found.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>

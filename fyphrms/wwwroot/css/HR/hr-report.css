@@ -1,0 +1,30 @@
+﻿@media print {
+
+    /* Hide everything */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* Only show the print area */
+    #print-area, #print-area * {
+        visibility: visible !important;
+    }
+
+    /* Position print area at the top-left when printing */
+    #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    /* Optional: remove page margins for cleaner printing */
+    @page {
+        margin: 20px;
+    }
+
+    /* Hide buttons */
+    button, a.btn {
+        display: none !important;
+    }
+}

@@ -1,0 +1,39 @@
+﻿@model fyphrms.Models.HR.AddDepartmentViewModel
+
+@{
+    ViewData["Title"] = "Add Department";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Add Department</h3>
+        <a asp-controller="HR" asp-action="HRDepartmentsPositions" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="HRAddDepartment" method="post">
+                <div class="mb-3">
+                    <label asp-for="DepartmentName" class="form-label"></label>
+                    <input asp-for="DepartmentName" class="form-control" />
+                    <span asp-validation-for="DepartmentName" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Department</button>
+                <a asp-action="HRDepartmentsPositions" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,184 @@
+﻿@model fyphrms.Models.Employees.PayrollViewModel
+
+@{
+    ViewData["Title"] = "Payroll";
+    Layout = "_Layout"; 
+
+    string summaryClass = Model.CurrentMonthStatus == "Paid" ? "summary-paid" : "summary-pending";
+}
+
+<style>
+
+    .current-month-summary {
+        border: 1px solid; 
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+
+    .btn-view-payslip {
+        
+        background-color: #007bff; 
+        color: white !important; 
+        padding: 8px 16px;
+        border-radius: 5px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid #007bff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+        transition: background-color 0.15s ease-in-out;
+    }
+
+        .btn-view-payslip:hover {
+            background-color: #0056b3; 
+            border-color: #004085;
+            text-decoration: none;
+        }
+
+    .net-pay-amount {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #343a40;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .status-badge-paid {
+        background-color: #d4edda; 
+        color: #155724; 
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    
+    .summary-paid {
+        background-color: #d4edda; /
+        border-color: #c3e6cb; 
+    }
+
+    
+    .summary-pending {
+        background-color: #fff3cd; 
+        border-color: #ffeeba; 
+    }
+
+    .status-badge-pending {
+        background-color: #fff3cd; 
+        color: #856404; 
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    
+    .table thead th {
+        border-bottom: 2px solid #e9ecef;
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .action-link {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark">Payroll</h2>
+        <span class="text-secondary">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+
+    <h3 class="mb-3">Payroll History</h3>
+
+    
+    <div class="current-month-summary @summaryClass shadow-sm d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="text-muted">Current Month (@Model.CurrentMonthDisplay)</h5>
+            <span class="net-pay-amount">
+                RM @Model.CurrentMonthNetPay.ToString("N2")
+            </span>
+            <div class="d-flex align-items-center mt-2">
+                <span class="text-muted mr-3">Status:</span>
+                @if (Model.CurrentMonthStatus == "Paid")
+                {
+                    <span class="status-badge-paid">Paid</span>
+                }
+                else
+                {
+                    <span class="status-badge-pending">@Model.CurrentMonthStatus</span>
+                }
+            </div>
+        </div>
+
+        @if (Model.CurrentMonthStatus == "Paid" && Model.CurrentMonthPayrollID > 0)
+        {
+            <a asp-action="EmployeeViewPayslip"
+               asp-route-id="@Model.CurrentMonthPayrollID"
+               class="btn-view-payslip">
+                View Payslip
+            </a>
+        }
+    </div>
+
+    <h4 class="mt-5 mb-3">Previous Payslips</h4>
+
+    
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">MONTH</th>
+                        <th style="width: 30%;">NET PAY</th>
+                        <th style="width: 20%;">STATUS</th>
+                        <th style="width: 20%;">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.PreviousPayslips.Any())
+                    {
+                        @foreach (var payslip in Model.PreviousPayslips)
+                        {
+                            <tr>
+                                <td>@payslip.MonthYear</td>
+                                <td>RM @payslip.NetPay.ToString("N2")</td>
+                                <td>
+                                    @if (payslip.Status == "Paid")
+                                    {
+                                        <span class="status-badge-paid">Paid</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge-pending">@payslip.Status</span>
+                                    }
+                                </td>
+                                <td>
+                                    
+                                    <a href="#" class="action-link">View Payslip</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No previous payslips found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

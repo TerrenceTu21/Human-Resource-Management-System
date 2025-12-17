@@ -1,0 +1,203 @@
+﻿@model fyphrms.Models.HR.HREmployeeListViewModel
+@using Microsoft.AspNetCore.Html
+
+@{
+    ViewData["Title"] = "Employee Management";
+    Layout = "_Layout"; 
+
+    var currentFilter = ViewBag.CurrentFilter as string;
+
+    string GetSortOrder(string currentSort) =>
+        ViewBag.CurrentSort == currentSort && ViewBag.CurrentOrder == "asc" ? "desc" : "asc";
+
+    IHtmlContent SortIcon(string currentSort)
+    {
+        if (ViewBag.CurrentSort == currentSort)
+        {
+            var iconClass = ViewBag.CurrentOrder == "desc" ? "fa-sort-down" : "fa-sort-up";
+            return new HtmlString($"<i class=\"fas {iconClass} ms-1\"></i>");
+        }
+        return new HtmlString("<i class=\"fas fa-sort text-muted ms-1\"></i>");
+    }
+}
+
+<link rel="stylesheet" href="~/css/HR/employee-management.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 fw-bold">Employee Management</h1>
+    <span class="text-muted small">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+</div>
+
+@* --- Search Bar Implementation --- *@
+<div class="mb-4">
+    <form asp-action="HREmployee" method="get">
+        <div class="input-group shadow-sm search-input-container">
+            <input type="text"
+                   name="searchString"
+                   value="@currentFilter"
+                   class="form-control"
+                   placeholder="Search by ID, Name, Position, or Department...">
+
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search me-1"></i> Search
+            </button>
+
+            @* Clear button resets the search filter, preserving sort details *@
+            <a asp-action="HREmployee"
+               asp-route-sortBy="@ViewBag.CurrentSort"
+               asp-route-sortOrder="@ViewBag.CurrentOrder"
+               class="btn btn-outline-secondary">
+                Clear
+            </a>
+        </div>
+    </form>
+</div>
+@* ---------------------------------- *@
+
+<div class="card shadow-sm employee-management-card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">All Employees</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 employee-list-table">
+                <thead class="table-light">
+                    <tr>
+                        @* ID Column - Preserve searchString on sort *@
+                        <th class="cursor-pointer">
+                            <a asp-action="HREmployee"
+                               asp-route-sortBy="ID"
+                               asp-route-sortOrder="@GetSortOrder("ID")"
+                               asp-route-searchString="@currentFilter"
+                               class="text-decoration-none text-dark">
+                                ID @SortIcon("ID")
+                            </a>
+                        </th>
+
+                        @* Name Column - Preserve searchString on sort *@
+                        <th class="cursor-pointer">
+                            <a asp-action="HREmployee"
+                               asp-route-sortBy="Name"
+                               asp-route-sortOrder="@GetSortOrder("Name")"
+                               asp-route-searchString="@currentFilter"
+                               class="text-decoration-none text-dark">
+                                NAME @SortIcon("Name")
+                            </a>
+                        </th>
+
+                        @* Position Column - Preserve searchString on sort *@
+                        <th class="cursor-pointer">
+                            <a asp-action="HREmployee"
+                               asp-route-sortBy="Position"
+                               asp-route-sortOrder="@GetSortOrder("Position")"
+                               asp-route-searchString="@currentFilter"
+                               class="text-decoration-none text-dark">
+                                POSITION @SortIcon("Position")
+                            </a>
+                        </th>
+
+                        @* Department Column - Preserve searchString on sort *@
+                        <th class="cursor-pointer">
+                            <a asp-action="HREmployee"
+                               asp-route-sortBy="Department"
+                               asp-route-sortOrder="@GetSortOrder("Department")"
+                               asp-route-searchString="@currentFilter"
+                               class="text-decoration-none text-dark">
+                                DEPARTMENT @SortIcon("Department")
+                            </a>
+                        </th>
+
+                        @* Email Column - Preserve searchString on sort *@
+                        <th class="cursor-pointer">
+                            <a asp-action="HREmployee"
+                               asp-route-sortBy="Email"
+                               asp-route-sortOrder="@GetSortOrder("Email")"
+                               asp-route-searchString="@currentFilter"
+                               class="text-decoration-none text-dark">
+                                EMAIL @SortIcon("Email")
+                            </a>
+                        </th>
+
+                        @* Date Joined Column - Preserve searchString on sort *@
+                        <th class="cursor-pointer">
+                            <a asp-action="HREmployee"
+                               asp-route-sortBy="DateJoined"
+                               asp-route-sortOrder="@GetSortOrder("DateJoined")"
+                               asp-route-searchString="@currentFilter"
+                               class="text-decoration-none text-dark">
+                                DATE JOINED @SortIcon("DateJoined")
+                            </a>
+                        </th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Employees != null && Model.Employees.Any())
+                    {
+                        @foreach (var employee in Model.Employees)
+                        {
+                            <tr class="clickable-row" data-employee-id="@employee.ID">
+                                <td>@employee.ID</td>
+                                <td>@employee.Name</td>
+                                <td>@employee.Position</td>
+                                <td>@employee.Department</td>
+                                <td>@employee.Email</td>
+                                <td>@employee.DateJoined.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <a asp-controller="HR" asp-action="HREditEmployee" asp-route-id="@employee.ID" class="text-primary small me-2 text-decoration-none">Edit</a>
+                                    <form asp-action="HRHideEmployee" asp-route-id="@employee.ID" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@employee.ID" />
+                                        <button type="submit" class="text-danger small btn btn-link p-0 m-0 align-baseline"
+                                                onclick="return confirm('Are you sure you want to hide this employee?');">
+                                            Hide
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No employee records found.
+                                @if (!string.IsNullOrEmpty(currentFilter))
+                                {
+                                    <span class="fw-bold">
+                                        (For search term: "@currentFilter")
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer bg-white border-0 py-3">
+        <div class="d-flex flex-wrap justify-content-end gap-2">
+            <a asp-controller="HR" asp-action="HRAddEmployee" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Add Employee
+            </a>
+
+            <a asp-controller="HR" asp-action="HRDepartmentsPositions" class="btn btn-outline-info">
+                <i class="fas fa-sitemap me-1"></i> Departments & Positions
+            </a>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', function(event) {
+                if (!event.target.closest('a')) {
+                    const employeeId = this.dataset.employeeId;
+                    window.location.href = `/HR/HREmployeeDetails/${employeeId}`;
+                }
+            });
+        });
+    </script>
+}

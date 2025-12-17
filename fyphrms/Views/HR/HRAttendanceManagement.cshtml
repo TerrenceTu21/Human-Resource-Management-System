@@ -1,0 +1,182 @@
+﻿@using fyphrms.Models.HR
+@model HRAttendanceViewModel
+
+@{
+    ViewData["Title"] = "Attendance Management";
+    Layout = "_Layout";
+}
+
+<style>
+    .attendance-container {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .attendance-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 20px;
+    }
+
+    .attendance-filter {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+        .attendance-filter input[type="date"],
+        .attendance-filter input[type="text"] {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e0;
+        }
+
+        .attendance-filter button {
+            padding: 8px 15px;
+            border: none;
+            background: #3182ce;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .attendance-filter button:hover {
+            background: #2b6cb0;
+        }
+
+    .summary-cards {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        flex: 1;
+        padding: 12px 15px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        text-align: center;
+    }
+
+        .summary-card.present {
+            background: #48bb78;
+        }
+
+        .summary-card.late {
+            background: #ed8936;
+        }
+
+        .summary-card.absent {
+            background: #e53e3e;
+        }
+
+    .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .attendance-table th, .attendance-table td {
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .attendance-table th {
+            background: #f7fafc;
+        }
+
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .status-present {
+        background: #c6f6d5;
+        color: #276749;
+    }
+
+    .status-late {
+        background: #feebc8;
+        color: #b7791f;
+    }
+
+    .status-absent {
+        background: #fed7d7;
+        color: #9b2c2c;
+    }
+
+    @@media print {
+        .attendance-filter {
+            display: none;
+        }
+    }
+</style>
+
+<div class="attendance-container" id="attendanceReportContainer">
+    <h2 class="attendance-title">Attendance — @Model.SelectedDate.ToString("dd MMM yyyy")</h2>
+
+    <form method="get" class="attendance-filter">
+        <input type="date" name="date" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+        <input type="text" name="search" placeholder="Search employee..." value="@Model.SearchQuery" />
+        <button type="submit">Go</button>
+    </form>
+
+    <div class="summary-cards">
+        <div class="summary-card present">Present: @Model.PresentCount</div>
+        <div class="summary-card late">Late: @Model.LateCount</div>
+        <div class="summary-card absent">Absent: @Model.AbsentCount</div>
+    </div>
+
+    <table class="attendance-table" id="attendanceTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Employee</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.AttendanceList.Count; i++)
+            {
+                var item = Model.AttendanceList[i];
+                string status = "Absent";
+                string badge = "status-absent";
+
+                if (item.CheckInTime.HasValue)
+                {
+                    if (item.CheckInTime > new TimeSpan(9, 0, 0))
+                    {
+                        status = "Late";
+                        badge = "status-late";
+                    }
+                    else
+                    {
+                        status = "Present";
+                        badge = "status-present";
+                    }
+                }
+
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@item.Employee.FirstName @item.Employee.LastName</td>
+                    <td>@(item.CheckInTime?.ToString(@"hh\:mm") ?? "-")</td>
+                    <td>@(item.CheckOutTime?.ToString(@"hh\:mm") ?? "-")</td>
+                    <td><span class="status-badge @badge">@status</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

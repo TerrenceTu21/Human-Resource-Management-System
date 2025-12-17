@@ -1,0 +1,217 @@
+﻿@model fyphrms.Models.HR.HRClaimManagementViewModel
+
+@{
+    ViewData["Title"] = "Claim Management";
+    Layout = "_Layout"; 
+
+    
+    string GetFilterClass(string filterName)
+    {
+        return Model.ActiveFilter.Equals(filterName, StringComparison.OrdinalIgnoreCase)
+            ? "bg-indigo-600 text-white hover:bg-indigo-700"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200";
+    }
+
+    string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Approved" => "bg-green-100 text-green-800",
+            "Pending" => "bg-yellow-100 text-yellow-800",
+            "Rejected" or "Cancelled" => "bg-red-100 text-red-800",
+            _ => "bg-gray-100 text-gray-800",
+        };
+    }
+}
+<link rel="stylesheet" href="~/css/HR/hrleavemanagement.css" asp-append-version="true" />
+
+
+<div class="p-6 bg-white rounded-lg shadow-lg">
+    <div class="flex justify-between items-center mb-6 border-b pb-4">
+        <h1 class="text-3xl font-bold text-gray-800">Claim Management</h1>
+        <span class="text-gray-500">@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</span>
+    </div>
+
+    <div class="flex space-x-3 mb-6">
+        <a asp-action="HRClaimManagement" asp-route-filter="All" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("all")">All</a>
+        <a asp-action="HRClaimManagement" asp-route-filter="Pending" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("pending")">Pending</a>
+        <a asp-action="HRClaimManagement" asp-route-filter="Approved" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("approved")">Approved</a>
+        <a asp-action="HRClaimManagement" asp-route-filter="Rejected" class="px-4 py-2 rounded-lg font-medium transition-colors @GetFilterClass("rejected")">Rejected</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+
+    <div class="overflow-x-auto bg-gray-50 rounded-lg shadow-inner">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Employee</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
+
+                    
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Expense Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Submitted Date</th>
+
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Proof</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Comments</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (!Model.Claims.Any())
+                {
+                    <tr>
+                        
+                        <td colspan="10" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No @(Model.ActiveFilter.Equals("all", StringComparison.OrdinalIgnoreCase) ? "" : Model.ActiveFilter) claims found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var claim in Model.Claims)
+                    {
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">@claim.ID</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">@claim.EmployeeName</td>
+                            <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate" title="@claim.ClaimDescription">@claim.ClaimDescription</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">RM @claim.Amount.ToString("N2")</td>
+
+
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700" title="Date expense occurred">@claim.DateOfExpenses.ToString("yyyy-MM-dd")</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700" title="Date claim was submitted">@claim.ClaimDate.ToString("yyyy-MM-dd")</td>
+
+                            <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">
+                                @if (!string.IsNullOrEmpty(claim.ProofDownloadUrl))
+                                {
+                                    <a href="@claim.ProofDownloadUrl" target="_blank" class="text-indigo-600 hover:text-indigo-900" title="@claim.ClaimDocumentFileName">@claim.ClaimDocumentFileName</a>
+                                }
+                                else
+                                {
+                                    <span>N/A</span>
+                                }
+                            </td>
+
+                            
+                            <td class="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">
+                                @if (claim.Status.Equals("Rejected", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(claim.RejectReason))
+                                {
+                                    <span title="@claim.RejectReason">@claim.RejectReason</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full @GetStatusClass(claim.Status)">
+                                    @claim.Status
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                
+
+                                @if (claim.Status == "Pending")
+                                {
+                                    @* --- Approve Form: Call custom confirmation function --- *@
+                                    <form asp-action="ApproveClaim" method="post" class="inline-block" id="approveClaimForm_@claim.ID">
+                                        <input type="hidden" name="id" value="@claim.ID" />
+                                        <button type="button"
+                                                onclick="confirmClaimApproval(document.getElementById('approveClaimForm_@claim.ID'), @claim.ID)"
+                                                class="text-green-600 hover:text-green-900 ml-2">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    @* --- Reject Form: Call custom confirmation function --- *@
+                                    <form asp-action="RejectClaim" method="post" class="inline-block" id="rejectClaimForm_@claim.ID">
+                                        <input type="hidden" name="id" value="@claim.ID" />
+                                        <button type="button"
+                                                onclick="confirmClaimRejection(document.getElementById('rejectClaimForm_@claim.ID'), @claim.ID)"
+                                                class="text-red-600 hover:text-red-900 ml-2">
+                                            Reject
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmClaimApproval(formElement, claimId) {
+        Swal.fire({
+            title: "Approve E-Claim?",
+            text: `Are you sure you want to APPROVE Claim ID ${claimId}?`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745", 
+            cancelButtonColor: "#6c757d", 
+            confirmButtonText: "Yes, Approve Claim"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                
+                formElement.submit();
+            }
+        });
+    }
+
+    function confirmClaimRejection(formElement, claimId) {
+        Swal.fire({
+            title: "Reject E-Claim?",
+            text: `Please provide the reason for REJECTING Claim ID ${claimId}. This action is irreversible.`,
+            icon: "warning",
+            input: 'textarea', 
+            inputLabel: 'Rejection Reason (Required)',
+            inputPlaceholder: 'Enter the reason for rejection here...',
+            inputAttributes: {
+                'aria-label': 'Type your rejection reason here'
+            },
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545", 
+            cancelButtonColor: "#6c757d", 
+            confirmButtonText: "Yes, Reject Claim",
+            
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') {
+                    return 'You need to write a rejection reason!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const rejectReason = result.value;
+
+                const reasonInput = document.createElement('input');
+                reasonInput.setAttribute('type', 'hidden');
+                reasonInput.setAttribute('name', 'RejectReason');
+                reasonInput.setAttribute('value', rejectReason);
+
+                formElement.appendChild(reasonInput);
+
+                formElement.submit();
+            }
+        });
+    }
+</script>

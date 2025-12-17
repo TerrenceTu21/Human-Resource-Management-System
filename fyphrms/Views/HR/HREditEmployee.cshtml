@@ -1,0 +1,117 @@
+﻿@model fyphrms.Models.HR.HREditEmployeeViewModel
+
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<h2>Edit Employee</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+<form asp-action="HREditEmployee" method="post">
+    <input type="hidden" asp-for="EmployeeID" />
+
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ContactNumber" class="form-label"></label>
+        <input asp-for="ContactNumber" class="form-control" />
+        <span asp-validation-for="ContactNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BasicSalary" class="form-label"></label>
+        <input asp-for="BasicSalary" class="form-control" />
+        <span asp-validation-for="BasicSalary" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EmploymentType" class="form-label"></label>
+        <select asp-for="EmploymentType" class="form-select">
+            <option value="Full-time" selected="@Model.EmploymentType == " Full-time"">Full-time</option>
+            <option value="Part-time" selected="@Model.EmploymentType == " Part-time"">Part-time</option>
+            <option value="Contract" selected="@Model.EmploymentType == " Contract"">Contract</option>
+        </select>
+        <span asp-validation-for="EmploymentType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DepartmentID" class="form-label"></label>
+        <select asp-for="DepartmentID" asp-items="Model.Departments" class="form-select" id="departmentSelect" data-current="@Model.DepartmentID"></select>
+        <span asp-validation-for="DepartmentID" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PositionID" class="form-label"></label>
+        <select asp-for="PositionID" asp-items="Model.Positions" class="form-select" id="positionSelect" data-current="@Model.PositionID"></select>
+        <span asp-validation-for="PositionID" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="HREmployee" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var initialPositionId = $('#positionSelect').data('current');
+
+            $('#departmentSelect').change(function() {
+                var departmentId = $(this).val();
+
+                if (!departmentId) {
+                    $('#positionSelect').html('<option value="">Select Position</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/HR/GetPositionsByDepartment',
+                    type: 'GET',
+                    data: { departmentId: departmentId },
+                    success: function(positions) {
+                        var options = '<option value="">Select Position</option>';
+                        positions.forEach(function(p) {
+                            var selected = (p.positionID == initialPositionId) ? 'selected' : '';
+                            options += `<option value="${p.positionID}" ${selected}>${p.positionTitle}</option>`;
+                        });
+                        $('#positionSelect').html(options);
+                    },
+                    error: function() {
+                        alert('Failed to load positions. Try again.');
+                    }
+                });
+            });
+
+            $('#departmentSelect').trigger('change');
+        });
+    </script>
+}
